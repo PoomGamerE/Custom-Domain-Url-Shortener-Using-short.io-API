@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shorten URL</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        form {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #34495e;
+        }
+
+        input[type="url"], input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        h2 {
+            font-size: 20px;
+            color: #555;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        #result {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            margin-top: 20px;
+            display: none; /* ซ่อนโดยเริ่มต้น */
+        }
+
+        #copyButton {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #2ecc71;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        #copyButton:hover {
+            background-color: #27ae60;
+        }
+
+        #copyMessage {
+            color: green;
+            margin-top: 10px;
+            display: none;
+        }
+
+        #qrcode {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+</head>
+<body>
+    <h1>ย่อลิงก์ของคุณ</h1>
+    <form id="shorten-form">
+        <label for="originalURL">Original URL (จำเป็น):</label>
+        <input type="url" id="originalURL" name="originalURL" placeholder="ใส่ลิงก์ที่คุณต้องการย่อ" required>
+
+        <label for="path">Custom Path (ตัวเลือก):</label>
+        <input type="text" id="path" name="path" placeholder="ตั้งชื่อเอง (ถ้ามี)">
+
+        <label for="title">Title (ตัวเลือก):</label>
+        <input type="text" id="title" name="title" placeholder="ตั้งชื่อสำหรับลิงก์">
+
+        <button type="submit">ย่อลิงก์</button>
+    </form>
+
+    <div id="result">
+        <h2>ลิงก์ที่ย่อแล้ว</h2>
+        <p><strong>ลิงก์ที่ย่อแล้ว:</strong> 
+            <a href="" id="shortURL" target="_blank"></a>
+        </p>
+        <button id="copyButton">คัดลอกลิงก์</button>
+        <p id="copyMessage">คัดลอกสำเร็จ!</p>
+        <div id="qrcode"></div>
+    </div>
+
+    <script>
+        document.getElementById('shorten-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const domain = 'your-custom-domain';
+            const originalURL = document.getElementById('originalURL').value;
+            const path = document.getElementById('path').value;
+            const title = document.getElementById('title').value;
+
+            const data = {
+                domain: domain,
+                originalURL: originalURL
+            };
+
+            if (path) data.path = path;
+            if (title) data.title = title;
+
+            const options = {
+                method: 'POST',
+                headers: {
+                    accept: 'application/json',
+                    'content-type': 'application/json',
+                    Authorization: 'your-public-api-key'
+                },
+                body: JSON.stringify(data)
+            };
+
+            fetch('https://api.short.io/links/public', options)
+                .then(response => response.json())
+                .then(response => {
+                    const resultContainer = document.getElementById('result');
+                    const shortURL = response.shortURL;
+                    const shortURLLink = document.getElementById('shortURL');
+                    
+                    shortURLLink.textContent = shortURL;
+                    shortURLLink.href = shortURL;
+
+                    // แสดงกรอบผลลัพธ์หลังจากได้รับผลลัพธ์
+                    resultContainer.style.display = 'block';
+
+                    // Generate QR code and replace the existing one
+                    const qrCodeContainer = document.getElementById("qrcode");
+                    qrCodeContainer.innerHTML = ''; // Clear previous QR code
+                    new QRCode(qrCodeContainer, {
+                        text: shortURL,
+                        width: 128,
+                        height: 128
+                    });
+
+                    // Copy link functionality
+                    document.getElementById('copyButton').addEventListener('click', function() {
+                        const tempInput = document.createElement('input');
+                        tempInput.value = shortURL;
+                        document.body.appendChild(tempInput);
+                        tempInput.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(tempInput);
+
+                        document.getElementById('copyMessage').style.display = 'block';
+                        setTimeout(() => {
+                            document.getElementById('copyMessage').style.display = 'none';
+                        }, 2000);
+                    });
+                })
+                .catch(err => {
+                    document.getElementById('result').textContent = 'Error: ' + err.message;
+                });
+        });
+    </script>
+</body>
+</html>
