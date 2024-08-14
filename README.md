@@ -1,4 +1,5 @@
-# URL Shortener Web Application
+# Custom Domain URL Shortener Web Application
+## Using short.io API
 
 This is a simple and user-friendly URL shortener web application that allows users to shorten URLs and generate QR codes. The design is clean and minimal, similar to popular URL shortener services like Bitly and TinyURL.
 
