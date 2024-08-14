@@ -1,5 +1,4 @@
-# Custom Domain URL Shortener Web Application
-## Using short.io API
+# Custom Domain URL Shortener Web Application (Using short.io API)
 
 This is a simple and user-friendly URL shortener web application that allows users to shorten URLs and generate QR codes. The design is clean and minimal, similar to popular URL shortener services like Bitly and TinyURL.
 
@@ -23,8 +22,8 @@ To run this project, you need a web browser and internet connection. No addition
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/PoomGamerE/Custom-Domain-Url-Shortener-Using-short.io-API.git
-    cd Custom-Domain-Url-Shortener-Using-short.io-API
+    git clone https://github.com/PoomGamerE/shorturl-public.git
+    cd shorturl-public
     ```
 
 2. Open `index.html` in your browser to start using the URL shortener.
